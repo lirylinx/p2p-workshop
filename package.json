@@ -1,0 +1,28 @@
+{
+  "name": "p2p-workshop",
+  "version": "0.0.1",
+  "description": "workshop p2p - Turoriais, Exercicios e soluções ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lirylinx/p2p-workshop.git"
+  },
+  "keywords": [
+    "p2p",
+    "hypercore"
+  ],
+  "author": "dercio guirruta",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lirylinx/p2p-workshop/issues"
+  },
+  "homepage": "https://github.com/lirylinx/p2p-workshop#readme",
+  "dependencies": {
+    "hyperspace": "^3.15.0",
+    "process-top": "^1.2.0",
+    "timediff": "^1.1.1"
+  }
+}
