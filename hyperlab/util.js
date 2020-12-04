@@ -1,6 +1,5 @@
 const { Client  } = require('hyperspace')
 
-start();
 
 async function start () {
     const c = new Client();
