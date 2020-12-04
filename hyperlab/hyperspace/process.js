@@ -1,24 +1,23 @@
 const stats = require( 'process-top' )()// instanciar o colector de estado do sistema
 const timediff = require( 'timediff' );
 
-intervalo = 5000;
-lista = [];
-function print() {
-    data = stats.toJSON();
-    lista.push(data);
-    console.log(data); // obter os dados
-    console.log(lista.length);
-    if (lista.length > 1) {
+exports.get = function () {
+    var data = null;
+    try {
+        data = stats.toJSON();
 
-    time1 = lista[lista.length - 1]
-    time2 = lista[lista.length - 2]
+    }catch( err ) {
+        console.error("[getProcess] Ocorreu um erro:", err);
+        data = null;
+    }
+
+    return data;
+}
+
+
+exports.time = function(time1, time2) {
     const diff = timediff(time2, time1);
-    print(diff);
+
+    return diff;
 }
 
-}
-
-// while(true) {
-    setInterval(print, intervalo) 
-
-// }
