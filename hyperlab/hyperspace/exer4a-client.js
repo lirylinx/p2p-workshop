@@ -25,6 +25,7 @@ async function start () {
     await core.ready();
 
     getProcess(core)
+
 }
 
 
@@ -36,4 +37,4 @@ async function getProcess(core) {
     console.log('total ' + core.length.toString());
 
   });
-
+}
