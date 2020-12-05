@@ -14,6 +14,12 @@ var lista = [];
 
 async function start () {
 
+
+    // obter chave do servidor passado como argumento
+    // na linha de comando
+    if ( process.argv.length <= 2) return 0;
+
+    const key = process.argv[2];
     // criar novo cliente
     const c = new Client();
 
@@ -21,7 +27,7 @@ async function start () {
     const store = c.corestore();
 
     // obter hypercore armazenado pelo nome
-    const core = store.get('ee3280e9794038f3e570e5571f52e17e5a04c17e97464b090211c7f9b8191eab', { valueEncoding: 'json'});
+    const core = store.get(key, { valueEncoding: 'json'});
     await core.ready();
 
     getProcess(core)
