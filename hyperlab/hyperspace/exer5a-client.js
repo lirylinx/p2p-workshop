@@ -28,18 +28,30 @@ async function start () {
 
     // obter hypercore armazenado pelo nome
     const core = store.get({ key: key,  valueEncoding: 'json'});
-    await replicate(core);
-    getProcess(core)
-    const lastBlock = await core.get(core.length - 1)
-    console.log(lastBlock)
 
+
+    setInterval(async () => {
+      try {
+        await replicate(core);
+
+        // const lastBlock = await core.get(core.length - 1)
+        // console.log(lastBlock)
+
+      } catch (error) {
+        console.error("Ocorreu um erro")
+        console.error(error)
+      }
+  }, intervalo) 
+
+  getProcess(core)
 
 }
 
 
 // inserir dados do processo ao core passado pelo argumento
 async function getProcess(core) {
-   
+         
+
   core.on('append', async function() {
     console.log( await core.get(core.length - 1 ));
     console.log('total ' + core.length.toString());
