@@ -15,18 +15,20 @@ start();
 async function start () {
 
     // criar novo cliente
-    const c = new Client();
+    const { corestore, replicate } = new Client()
 
     // obter o corestore
-    const store = c.corestore();
+    const store = corestore();
 
     // obter hypercore armazenado pelo nome
-    const core = store.get({ name: 'coletor-estado-3'});
+    const core = store.get({ name: 'coletor-estado-3', valueEncoding: 'json'});
     await core.ready();
     console.log('colector-estado key ' + core.key.toString('hex'));
-    await c.replicate(core);
+    await replicate(core);
     // inserir Dados de processo do sistema a cada 5 segundos.
-    setInterval(insertProcess, intervalo, core) 
+    setInterval(() => {
+        core.append(Process.get()).catch(err => console.error( 'Estado nao podem ser anexados') )
+    }, intervalo) 
 }
 
 

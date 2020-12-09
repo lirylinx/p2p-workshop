@@ -21,16 +21,18 @@ async function start () {
 
     const key = process.argv[2];
     // criar novo cliente
-    const c = new Client();
+    const { corestore, replicate } = new Client()
 
     // obter o corestore
-    const store = c.corestore();
+    const store = corestore();
 
     // obter hypercore armazenado pelo nome
-    const core = store.get(key, { valueEncoding: 'json'});
-    await core.ready();
-    await c.replicate(core);
+    const core = store.get({ key: key,  valueEncoding: 'json'});
+    await replicate(core);
     getProcess(core)
+    const lastBlock = await core.get(core.length - 1)
+    console.log(lastBlock)
+
 
 }
 
