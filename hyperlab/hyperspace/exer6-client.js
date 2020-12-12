@@ -1,4 +1,5 @@
-const { Client } = require('hyperspace')
+const { Client } = require('hyperspace');
+const { time } = require('./process');
 
 
 
@@ -9,16 +10,16 @@ if ( process.argv.length <= 2) return 0;
 const STATS_CORE_KEY = process.argv[2];
 let TARGET = 0
 if ( process.argv[3] == null ) {
- TARGET = new Date(Date.now() - (60 * 5e3))
+ TARGET = (new Date(Date.now() - (60 * 2.5e3))).toISOString()
 
 
 }else {
-const STATS_MINUTE_AGO = process.argv[3]; 
- TARGET = new Date(Date.now() - (60 * (STATS_MINUTE_AGO * 1e3)))
+const STATS_MINUTE_AGO =  process.argv[3]
+ TARGET = (new Date(Date.now() - (60 * (parseInt(STATS_MINUTE_AGO) * 1e3)))).toISOString()
 
 }
 start()
-
+console.log(process.argv[3])
 async function start () {
   
 
@@ -28,63 +29,40 @@ async function start () {
   const store = corestore()
 
   // Get the stats core.
-  const statsCore = store.get({ key: STATS_CORE_KEY, valueEncoding: 'json' })
-  await statsCore.ready();
-  // Connect the stats core to the network.
-  await replicate(statsCore)
+  const core = store.get({ key: STATS_CORE_KEY, valueEncoding: 'json' })
+  await core.ready();
 
-  let blocksDownloaded = 0
-  statsCore.on('download', () => {
-    blocksDownloaded++
-  })
-  setInterval(() => {
-    console.log('Blocks Downloaded:', blocksDownloaded)
-  }, 2000)
+  // console.log('Waiting 5s for some stats to be appended.')
+  // await new Promise(resolve => setTimeout(resolve, 5000))  
+  const stats = await findClosest( core, TARGET );
+  console.log( 'stats ', stats)
 
-  const algorithm = NAIVE_MODE ? naiveClosestStats : bisectClosestStats
-
-  // If PREFETCH is true, we'll mark the entire core for parallel downloading.
-  if (PREFETCH) statsCore.download()
-
-  const closestStats = await algorithm(statsCore, TARGET)
-  console.log("closest", closestStats)
-  if (!closestStats) {
-    console.log('No stats found for that time.')
-  } else {
-    console.log('Found stats:', closestStats)
-  }
 }
 
-async function naiveClosestStats (core, target) {
-  for (let i = 0; i < core.length - 1; i++) {
-    const block = await core.get(i)
-    if (new Date(block.timestamp) >= target) return block
-  }
-  return null
-}
-
-async function getClosestStatsBisect(core, target) {
-  return bisect(core, target, {
-    get: idx => core.get(idx),
-    map: block => block.timestamp
-  })
-}
-
-async function bisectClosestStats (core, target) {
-  let lower = 0
-  let upper = core.length
-
-  while (lower < upper) {
-    const mid = Math.floor((upper + lower) / 2)  
-
-    // These tertiary operaters lets us easily test with Arrays first.
-    const block = await core.get(mid)
-    const date = new Date(block.timestamp)
-
-    if (date < target) lower = mid + 1
-    else upper = mid
-  }
-
-  return core.get(lower)
-}
  
+
+async function findClosest (core, key) {
+  if (!core.length) return null
+  let latest = await core.get(core.length - 1)
+  return moveCloser()
+
+  async function moveCloser () {
+    let closest = closestBlock(key, latest)  
+    if (closest === -1) return latest
+    latest = await core.get(closest)
+    return moveCloser()
+  }
+}
+
+ function closestBlock (timestamp, block) {
+  if (!block.index.length) return -1
+
+  for (let i = 0; i < block.index.length; i++) {
+    if (block.index[i].timestamp < timestamp) {
+      if (i === 0) return -1
+      return block.index[i - 1].blockIndex
+    }
+  }
+
+  return block.index[block.index.length - 1].blockIndex
+}
