@@ -21,8 +21,10 @@
   },
   "homepage": "https://github.com/lirylinx/p2p-workshop#readme",
   "dependencies": {
+    "hyperbee": "^1.1.0",
     "hyperspace": "^3.15.0",
     "process-top": "^1.2.0",
-    "timediff": "^1.1.1"
+    "timediff": "^1.1.1",
+    "websters-english-dictionary": "^2.0.0"
   }
 }
